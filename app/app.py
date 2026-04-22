@@ -3,23 +3,27 @@ import pandas as pd
 import pickle
 import os
 
-# -------------------------------
-# LOAD MODEL (WORKS EVERYWHERE)
-# -------------------------------
-model_path = os.path.join(os.path.dirname(__file__), "..", "models", "pipeline_model.pkl")
+# -----------------------------------
+# LOAD MODEL (WORKS LOCAL + CLOUD)
+# -----------------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+model_path = os.path.join(BASE_DIR, "models", "pipeline_model.pkl")
+
 model = pickle.load(open(model_path, "rb"))
 
-# -------------------------------
+# -----------------------------------
 # UI
-# -------------------------------
+# -----------------------------------
+st.set_page_config(page_title="Employee Performance Predictor", layout="centered")
+
 st.title("🚀 Employee Performance Prediction System")
 st.markdown("Predict employee performance using Machine Learning")
 
 st.write("### Enter Employee Details:")
 
-# -------------------------------
+# -----------------------------------
 # INPUT FIELDS
-# -------------------------------
+# -----------------------------------
 data = {
     "Age": st.slider("Age", 18, 60, 30),
     "Gender": st.selectbox("Gender", ["Male", "Female"]),
@@ -27,7 +31,10 @@ data = {
         "Education Background",
         ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"]
     ),
-    "MaritalStatus": st.selectbox("Marital Status", ["Single", "Married", "Divorced"]),
+    "MaritalStatus": st.selectbox(
+        "Marital Status",
+        ["Single", "Married", "Divorced"]
+    ),
     "EmpDepartment": st.selectbox(
         "Department",
         ["Sales", "Development", "Research & Development", "Human Resources", "Finance"]
@@ -58,20 +65,24 @@ data = {
     "Attrition": st.selectbox("Attrition", ["Yes", "No"])
 }
 
-# -------------------------------
+# -----------------------------------
 # CONVERT TO DATAFRAME
-# -------------------------------
+# -----------------------------------
 input_df = pd.DataFrame([data])
 
-# -------------------------------
+# -----------------------------------
 # PREDICTION
-# -------------------------------
+# -----------------------------------
 if st.button("Predict Performance"):
-    prediction = model.predict(input_df)[0]
+    try:
+        prediction = model.predict(input_df)[0]
 
-    if prediction == 2:
-        st.error("🔴 Low Performance Employee")
-    elif prediction == 3:
-        st.warning("🟡 Average Performance Employee")
-    else:
-        st.success("🟢 High Performance Employee")
+        if prediction == 2:
+            st.error("🔴 Low Performance Employee")
+        elif prediction == 3:
+            st.warning("🟡 Average Performance Employee")
+        else:
+            st.success("🟢 High Performance Employee")
+
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
