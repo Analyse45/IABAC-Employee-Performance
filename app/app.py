@@ -4,12 +4,27 @@ import pickle
 import os
 
 # -----------------------------------
-# LOAD MODEL (WORKS LOCAL + CLOUD)
+# LOAD MODEL (ROBUST VERSION)
 # -----------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(BASE_DIR, "models", "pipeline_model.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "pipeline_model.pkl")
 
-model = pickle.load(open(model_path, "rb"))
+# Debug (helps if something breaks)
+st.write("Model path:", MODEL_PATH)
+
+try:
+    model = pickle.load(open(MODEL_PATH, "rb"))
+except Exception as e:
+    st.error(f"❌ Model loading failed: {e}")
+    
+    # Show what files exist (debugging)
+    try:
+        st.write("Files inside models folder:")
+        st.write(os.listdir(os.path.join(BASE_DIR, "models")))
+    except:
+        st.write("Could not access models folder")
+
+    st.stop()
 
 # -----------------------------------
 # UI
@@ -85,4 +100,4 @@ if st.button("Predict Performance"):
             st.success("🟢 High Performance Employee")
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"❌ Prediction failed: {e}")
