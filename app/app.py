@@ -1,15 +1,25 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import os
 
-# Load pipeline model
-model = pickle.load(open("../models/pipeline_model.pkl", "rb"))
+# -------------------------------
+# LOAD MODEL (WORKS EVERYWHERE)
+# -------------------------------
+model_path = os.path.join(os.path.dirname(__file__), "..", "models", "pipeline_model.pkl")
+model = pickle.load(open(model_path, "rb"))
 
-st.title("Employee Performance Prediction System")
+# -------------------------------
+# UI
+# -------------------------------
+st.title("🚀 Employee Performance Prediction System")
+st.markdown("Predict employee performance using Machine Learning")
 
-st.write("Enter employee details below:")
+st.write("### Enter Employee Details:")
 
-# Input fields
+# -------------------------------
+# INPUT FIELDS
+# -------------------------------
 data = {
     "Age": st.slider("Age", 18, 60, 30),
     "Gender": st.selectbox("Gender", ["Male", "Female"]),
@@ -48,16 +58,20 @@ data = {
     "Attrition": st.selectbox("Attrition", ["Yes", "No"])
 }
 
-# Convert to dataframe
+# -------------------------------
+# CONVERT TO DATAFRAME
+# -------------------------------
 input_df = pd.DataFrame([data])
 
-# Prediction
+# -------------------------------
+# PREDICTION
+# -------------------------------
 if st.button("Predict Performance"):
     prediction = model.predict(input_df)[0]
 
     if prediction == 2:
-        st.error("Low Performance Employee")
+        st.error("🔴 Low Performance Employee")
     elif prediction == 3:
-        st.warning("Average Performance Employee")
+        st.warning("🟡 Average Performance Employee")
     else:
-        st.success("High Performance Employee")
+        st.success("🟢 High Performance Employee")
